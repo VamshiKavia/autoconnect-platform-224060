@@ -164,6 +164,7 @@ def ws_help():
 # PUBLIC_INTERFACE
 @app.post("/auth/login", tags=["auth"], summary="Login (stub)", description="Accepts any email/password and returns a mock token.")
 def login(payload: AuthRequest = Body(...)) -> AuthResponse:
+    """Mock login endpoint. Creates a user if missing and returns a mock bearer token."""
     token = f"mocktoken-{hash(payload.email) % 1_000_000}"
     if payload.email not in MOCK_USERS:
         MOCK_USERS[payload.email] = {
@@ -175,6 +176,48 @@ def login(payload: AuthRequest = Body(...)) -> AuthResponse:
         }
     MOCK_TOKENS[token] = payload.email
     return AuthResponse(access_token=token, token_type="bearer")
+
+# PUBLIC_INTERFACE
+@app.post("/api/auth/login", tags=["auth"], summary="Login (stub, API-prefixed mirror)", description="Mirror of /auth/login under /api prefix for frontend clients that auto-prefix with /api.")
+def login_api_prefixed(payload: AuthRequest = Body(...)) -> AuthResponse:
+    """Mirror route for API-prefixed login to support clients that prepend /api."""
+    return login(payload)
+
+class RegisterRequest(BaseModel):
+    email: str = Field(..., description="User email")
+    password: str = Field(..., description="User password (not validated in mock)")
+    name: str = Field(..., description="User display name")
+
+class RegisterResponse(BaseModel):
+    access_token: str = Field(..., description="Mock access token")
+    token_type: str = Field(..., description="Token type")
+    user: Profile = Field(..., description="Created user profile")
+
+# PUBLIC_INTERFACE
+@app.post("/auth/register", tags=["auth"], summary="Register (stub)", description="Creates a mock user record and returns token + user.")
+def register(payload: RegisterRequest = Body(...)) -> RegisterResponse:
+    """Mock register endpoint. Idempotent: creating an already-existing email returns existing profile."""
+    email = payload.email.strip().lower()
+    # Create user if not exists
+    if email not in MOCK_USERS:
+        MOCK_USERS[email] = {
+            "email": email,
+            "name": payload.name or email.split("@")[0].title(),
+            "bio": "",
+            "phone": "",
+            "created_at": datetime.utcnow().isoformat(),
+        }
+    # Issue a new token on registration for convenience
+    token = f"mocktoken-{hash(email) % 1_000_000}"
+    MOCK_TOKENS[token] = email
+    user = Profile(**MOCK_USERS[email])
+    return RegisterResponse(access_token=token, token_type="bearer", user=user)
+
+# PUBLIC_INTERFACE
+@app.post("/api/auth/register", tags=["auth"], summary="Register (stub, API-prefixed mirror)", description="Mirror of /auth/register under /api prefix.")
+def register_api_prefixed(payload: RegisterRequest = Body(...)) -> RegisterResponse:
+    """Mirror route for API-prefixed register to support clients that prepend /api."""
+    return register(payload)
 
 # PUBLIC_INTERFACE
 @app.post("/auth/logout", tags=["auth"], summary="Logout (stub)", description="Invalidates mock token.")

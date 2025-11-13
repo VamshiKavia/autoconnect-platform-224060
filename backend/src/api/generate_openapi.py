@@ -1,7 +1,8 @@
 import json
 import os
 
-from src.api.main import app
+# Prefer the main application that defines all routes
+from backend.main import app
 
 # Get the OpenAPI schema
 openapi_schema = app.openapi()
