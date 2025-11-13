@@ -1,6 +1,6 @@
 import os
 from typing import List, Optional, Dict, Any
-from fastapi import FastAPI, HTTPException, Body, Depends
+from fastapi import FastAPI, HTTPException, Body, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -131,7 +131,7 @@ class Profile(BaseModel):
     created_at: Optional[str] = None
 
 
-def get_current_user(authorization: Optional[str] = None) -> Dict[str, Any]:
+def get_current_user(authorization: Optional[str] = Header(default=None)) -> Dict[str, Any]:
     """
     Extract mock token from Authorization header and return user dict.
     Authorization: Bearer <token>
