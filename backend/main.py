@@ -1,8 +1,7 @@
 import os
 from typing import List, Optional, Dict, Any
-from fastapi import FastAPI, HTTPException, Body, Depends, Header, Response
+from fastapi import FastAPI, HTTPException, Body, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -26,10 +25,6 @@ app = FastAPI(
     version="0.1.0",
     openapi_tags=openapi_tags,
 )
-
-# Enable gzip compression for JSON/text responses to reduce payload size
-# Level defaults are fine; keep sizes modest for CPU
-app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # CORS: allow frontend dev server
 app.add_middleware(
@@ -235,40 +230,24 @@ def logout(authorization: Optional[str] = Body(None, embed=True)):
             MOCK_TOKENS.pop(token, None)
     return {"ok": True}
 
-def _cache_headers(resp: Response, ttl_seconds: int = 60):
-    """
-    Set modest caching headers to improve performance without staleness risks.
-    """
-    resp.headers["Cache-Control"] = f"public, max-age={ttl_seconds}, stale-while-revalidate=120"
-    # Weak ETag using data length + current minute tick (coarse)
-    resp.headers["ETag"] = f'W/"cars-{len(MOCK_CARS)}-{datetime.utcnow().strftime("%Y%m%d%H%M")}"'
-
-
 # PUBLIC_INTERFACE
 @app.get("/cars", tags=["cars"], summary="List cars", description="Returns latest car launches and catalog.")
-def list_cars(response: Response) -> List[Car]:
-    _cache_headers(response, 60)
+def list_cars() -> List[Car]:
     return [Car(**c) for c in MOCK_CARS]
 
 # PUBLIC_INTERFACE
 @app.get("/services", tags=["services"], summary="List services", description="Returns available car services.")
-def list_services(response: Response) -> List[Service]:
-    response.headers["Cache-Control"] = "public, max-age=120, stale-while-revalidate=180"
-    response.headers["ETag"] = f'W/"services-{len(MOCK_SERVICES)}-{datetime.utcnow().strftime("%Y%m%d%H%M")}"'
+def list_services() -> List[Service]:
     return [Service(**s) for s in MOCK_SERVICES]
 
 # PUBLIC_INTERFACE
 @app.get("/parts", tags=["parts"], summary="List parts", description="Returns available spare parts.")
-def list_parts(response: Response) -> List[Part]:
-    response.headers["Cache-Control"] = "public, max-age=120, stale-while-revalidate=180"
-    response.headers["ETag"] = f'W/"parts-{len(MOCK_PARTS)}-{datetime.utcnow().strftime("%Y%m%d%H%M")}"'
+def list_parts() -> List[Part]:
     return [Part(**p) for p in MOCK_PARTS]
 
 # PUBLIC_INTERFACE
 @app.get("/service-centers", tags=["centers"], summary="List service centers", description="Returns service centers with coordinates for mapping.")
-def list_service_centers(response: Response) -> List[ServiceCenter]:
-    response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=300"
-    response.headers["ETag"] = f'W/"centers-{len(MOCK_CENTERS)}-{datetime.utcnow().strftime("%Y%m%d%H%M")}"'
+def list_service_centers() -> List[ServiceCenter]:
     return [ServiceCenter(**c) for c in MOCK_CENTERS]
 
 # PUBLIC_INTERFACE

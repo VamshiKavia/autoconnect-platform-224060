@@ -31,9 +31,3 @@ Open http://localhost:3001/docs for API docs.
 - GET /service-centers
 - GET /profile      (requires Authorization: Bearer <token>)
 - PUT /profile      (requires Authorization: Bearer <token>)
-
-## Performance headers
-
-- GZip compression enabled for responses >= 500 bytes
-- Cache-Control and weak ETag set on list endpoints to improve repeat loads
-  - Inspect using browser devtools: Response headers should include Cache-Control and ETag
