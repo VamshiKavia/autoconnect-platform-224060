@@ -1,33 +1,45 @@
-# Backend (FastAPI)
+# FastAPI Backend - Car Company App
 
-Provides mock endpoints for the car company app: auth (stub), cars, services, parts, service centers, and user profile. CORS is configured to allow the React frontend.
+This FastAPI server provides mock/in-memory endpoints for the car company application.
+
+## Features
+
+- Auth endpoints (mock token)
+  - POST /api/auth/register
+  - POST /api/auth/login
+  - GET /api/auth/me
+- Cars
+  - GET /api/cars/latest
+  - GET /api/cars
+  - GET /api/cars/{id}
+- Services and Parts
+  - GET /api/services
+  - GET /api/parts
+- Service Centers
+  - GET /api/service-centers
+- User Profile (mock)
+  - GET /api/profile
+  - PUT /api/profile
+- CORS enabled for http://localhost:3000 by default
+
+## Environment
+
+Values are optional and controlled via .env.
+
+- BACKEND_PORT: default 3001
+- BACKEND_HOST: default 0.0.0.0
+- ALLOW_ORIGINS: comma-separated allowed origins (default http://localhost:3000)
+
+See .env.example.
 
 ## Run
 
-1) Create and activate a virtual env (recommended)
-2) Install dependencies:
+1) Create virtualenv and install:
+   pip install -r backend/requirements.txt
 
-pip install -r backend/requirements.txt
+2) Start server:
+   uvicorn backend.main:app --host 0.0.0.0 --port 3001 --reload
 
-3) Set environment variables (see .env.example):
+Open docs at http://localhost:3001/docs
 
-- BACKEND_PORT (default 3001)
-- FRONTEND_URL (default http://localhost:3000)
-
-4) Start server:
-
-uvicorn backend.main:app --host 0.0.0.0 --port ${BACKEND_PORT:-3001} --reload
-
-Open http://localhost:3001/docs for API docs.
-
-## Endpoints
-
-- GET /            -> health
-- POST /auth/login -> returns mock bearer token
-- POST /auth/logout
-- GET /cars
-- GET /services
-- GET /parts
-- GET /service-centers
-- GET /profile      (requires Authorization: Bearer <token>)
-- PUT /profile      (requires Authorization: Bearer <token>)
+Health: GET http://localhost:3001/
