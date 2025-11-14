@@ -4,23 +4,37 @@ This FastAPI server provides mock/in-memory endpoints for the car company applic
 
 ## Features
 
-- Auth endpoints (mock token)
+- Health and Docs
+  - GET / (health with metadata)
+  - GET /docs/guide
+  - GET /api/docs/websocket
+- Auth endpoints (mock token, also mirrored without /api for convenience)
+  - POST /auth/register
+  - POST /auth/login
+  - POST /auth/logout
+  - GET /api/auth/me
   - POST /api/auth/register
   - POST /api/auth/login
-  - GET /api/auth/me
 - Cars
-  - GET /api/cars/latest
+  - GET /cars
+  - GET /cars/{id}
   - GET /api/cars
   - GET /api/cars/{id}
+  - GET /api/cars/latest
 - Services and Parts
+  - GET /services
+  - GET /parts
   - GET /api/services
   - GET /api/parts
 - Service Centers
+  - GET /service-centers
   - GET /api/service-centers
 - User Profile (mock)
+  - GET /profile
+  - PUT /profile
   - GET /api/profile
   - PUT /api/profile
-- CORS enabled for http://localhost:3000 by default
+- CORS enabled for http://localhost:3000 by default via ALLOW_ORIGINS env.
 
 ## Environment
 
