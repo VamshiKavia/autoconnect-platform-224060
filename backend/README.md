@@ -1,18 +1,29 @@
-# FastAPI Backend - Ocean Motors (Mock)
+# Ocean Motors Backend (FastAPI)
 
-Mock backend with CORS for the React SPA. Implements minimal endpoints:
+Mock FastAPI backend serving endpoints for the React frontend.
 
-- GET / -> health
-- POST /api/auth/login
-- POST /api/auth/register
-- GET /api/cars
-- GET /api/services
-- GET /api/parts
-- GET /api/service-centers
-- GET /api/profile (requires Authorization: Bearer <token>)
-- PUT /api/profile (requires Authorization)
+## Run
 
-Run (dev):
-- Create .env from .env.example
-- pip install -r requirements.txt
-- uvicorn app.main:app --host 0.0.0.0 --port 3001 --reload
+- Create and configure environment variables as needed
+  - FRONTEND_URL=http://localhost:3000 (for CORS)
+  - BACKEND_PORT=3001
+- Install dependencies:
+  - pip install fastapi uvicorn pydantic python-dotenv
+- Start:
+  - uvicorn app.main:app --host 0.0.0.0 --port 3001
+
+OpenAPI docs at /docs
+
+## Endpoints (subset)
+
+- GET /                  - Health
+- POST /api/auth/login   - Mock login
+- POST /api/auth/register- Mock register
+- GET /api/cars          - Latest cars
+- GET /api/services      - Services
+- GET /api/parts         - Parts
+- GET /api/service-centers - Service centers
+- GET /api/profile       - Profile (requires Bearer mock-token)
+- PUT /api/profile       - Update profile (requires Bearer mock-token)
+
+CORS allowed origin defaults to http://localhost:3000 (configurable).
